@@ -1,0 +1,17 @@
+conwaygame is a C++ simulation for Conway's Game of Life.
+
+https://en.wikipedia.org/wiki/Conway's_Game_of_Life
+
+conwaygame requires C++11 and Qt.
+
+
+Install
+-------
+
+./configure
+make
+make install
+
+
+conwaygame is being developed by Christian Blume. Contact Christian at
+chr.blume@gmail.com for any questions or comments.

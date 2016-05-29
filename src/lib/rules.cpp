@@ -1,0 +1,1 @@
+#include "conwaygame/rules.h"

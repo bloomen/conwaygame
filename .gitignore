@@ -41,3 +41,4 @@ test_data.*
 test-driver
 *.tar.gz
 INSTALL
+src/bin/conwaygame

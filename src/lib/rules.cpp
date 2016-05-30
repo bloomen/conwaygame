@@ -1,6 +1,7 @@
 #include "conwaygame/rules.h"
 #include "conwaygame/expects.h"
 #include "conwaygame/cxxpool.h"
+#include <algorithm>
 
 
 namespace cg {
@@ -44,23 +45,27 @@ std::vector<bool> next_generation(const std::vector<bool>& data,
   EXPECTS(n > 1);
   EXPECTS(data.size() == static_cast<std::uint64_t>(n * n));
   EXPECTS(n_threads >= 0);
-  std::vector<bool> result(data.size());
   cxxpool::thread_pool pool{n_threads};
+  std::vector<std::future<bool>> futures;
+  futures.reserve(data.size());
   for (std::int64_t i=0; i < n; ++i) {
     for (std::int64_t j=0; j < n; ++j) {
-      pool.push([&data, &result, i, j, n] {
+      futures.emplace_back(pool.push([&data, i, j, n]() -> bool {
         const auto k = i * n + j;
         const auto n_alive = n_alive_neighbors(data, i, j, n);
         if (data[k] && (n_alive < 2 || n_alive > 3)) {  // alive
-          result[k] = false;  // under-population or over-population
+          return false;  // under-population or over-population
         } else if (!data[k] && n_alive == 3) {  // dead
-          result[k] = true;  // reproduction
+          return true;  // reproduction
         } else {
-          result[k] = data[k];
+          return data[k];
         }
-      });
+      }));
     }
   }
+  std::vector<bool> result(data.size());
+  std::transform(futures.begin(), futures.end(), result.begin(),
+                 [](std::future<bool>& f) { return f.get(); });
   return result;
 }
 

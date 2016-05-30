@@ -61,7 +61,7 @@ TEST(test_one_alive_with_wrapping) {
 
 COLLECTION(test_next_generation) {
 
-const int n_threads = 1;
+const int n_threads = 4;
 
 TEST(test_with_minimal_dead_board) {
   const std::vector<bool> data = {false, false,

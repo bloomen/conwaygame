@@ -13,5 +13,8 @@ make
 make install
 
 
+To build and run the tests the following libraries are required:
+- libunittest (http://libunittest.sourceforge.net)
+
 conwaygame is being developed by Christian Blume. Contact Christian at
 chr.blume@gmail.com for any questions or comments.

@@ -10,6 +10,10 @@ libconwaygame_ladir = $(includedir)
 libconwaygame_la_HEADERS = \
 conwaygame/rules.h
 
+EXTRA_DIST = \
+conwaygame/expects.h \
+conwaygame/cxxpool.h
+
 # the sources to add to the library and to add to the source distribution
 libconwaygame_la_SOURCES = \
 rules.cpp

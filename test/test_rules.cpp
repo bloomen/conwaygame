@@ -23,7 +23,9 @@ void make_test_one_alive(int i, int j) {
   std::vector<bool> data(n*n, false);
   data[i * n + j] = true;
   const auto n_alive = cg::n_alive_neighbors(data, 2, 2, n);
-  ASSERT_EQUAL_MSG(1, n_alive, "(" << i << ", " << j << ")");
+  std::stringstream message;
+  message  << "(" << i << ", " << j << ")";
+  ASSERT_EQUAL_MSG(1, n_alive, message);
 }
 
 TEST(test_one_alive) {
@@ -42,7 +44,9 @@ void make_test_one_alive_with_wrapping(int i, int j) {
   std::vector<bool> data(n*n, false);
   data[i * n + j] = true;
   const auto n_alive = cg::n_alive_neighbors(data, 4, 4, n);
-  ASSERT_EQUAL_MSG(1, n_alive, "(" << i << ", " << j << ")");
+  std::stringstream message;
+  message  << "(" << i << ", " << j << ")";
+  ASSERT_EQUAL_MSG(1, n_alive, message);
 }
 
 TEST(test_one_alive_with_wrapping) {

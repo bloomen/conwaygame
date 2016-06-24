@@ -2,7 +2,7 @@ conwaygame is a C++ simulation for Conway's Game of Life.
 
 https://en.wikipedia.org/wiki/Conway's_Game_of_Life
 
-conwaygame requires C++11 and Qt.
+conwaygame requires C++11 and Qt4.
 
 
 Install

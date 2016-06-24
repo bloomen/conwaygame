@@ -1,6 +1,12 @@
-#include <iostream>
+#include <QtGui/QApplication>
+#include <QtGui/QTextEdit>
 
 
-int main(int argc, char **argv) {
-    std::cout << "Hello World" << std::endl;
+int main(int argv, char **args) {
+  QApplication app(argv, args);
+
+  QTextEdit textEdit;
+  textEdit.show();
+
+  return app.exec();
 }

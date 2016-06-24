@@ -14,7 +14,7 @@ int n_alive_neighbors(const std::vector<bool>& data,
   EXPECTS(i >= 0 && i < n);
   EXPECTS(j >= 0 && j < n);
 
-  auto use_or_wrap = [n](std::int64_t index) {
+  auto use_or_wrap = [n](std::int64_t index) -> std::int64_t {
     if (index < 0)
       return n - 1;
     else if (index > n - 1)
@@ -47,7 +47,6 @@ std::vector<bool> next_generation(const std::vector<bool>& data,
   EXPECTS(n_threads >= 0);
   cxxpool::thread_pool pool{n_threads};
   std::vector<std::future<bool>> futures;
-  futures.reserve(data.size());
   for (std::int64_t i=0; i < n; ++i) {
     for (std::int64_t j=0; j < n; ++j) {
       futures.emplace_back(pool.push([&data, i, j, n]() -> bool {

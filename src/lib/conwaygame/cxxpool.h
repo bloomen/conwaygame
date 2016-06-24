@@ -1,6 +1,6 @@
 /**
  * A portable, header-only thread pool for C++
- * @version 0.3.0
+ * @version 1.0.1
  * @author Christian Blume (chr.blume@gmail.com)
  * @copyright 2015-2016 by Christian Blume
  * cxxpool is released under the MIT license:
@@ -15,16 +15,128 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <chrono>
+#include <cstddef>
 
 
 namespace cxxpool {
+
+/**
+ * Waits until all futures contain results
+ */
+template<typename Iterator>
+inline
+void wait(Iterator first, Iterator last) {
+  for (; first != last; ++first)
+    first->wait();
+}
+/**
+ * Waits until all futures contain results with a given timeout duration and
+ * returns a container of std::future::status
+ */
+template<typename Result, typename Iterator, typename Rep, typename Period>
+inline
+Result wait_for(Iterator first, Iterator last,
+                const std::chrono::duration<Rep, Period>& timeout_duration,
+                Result result) {
+  for (; first != last; ++first)
+    result.emplace_back(first->wait_for(timeout_duration));
+  return result;
+}
+/**
+ * Waits until all futures contain results with a given timeout duration and
+ * returns a vector of std::future::status
+ */
+template<typename Iterator, typename Rep, typename Period>
+inline
+std::vector<std::future_status> wait_for(
+    Iterator first, Iterator last,
+    const std::chrono::duration<Rep, Period>& timeout_duration) {
+  return wait_for(first, last, timeout_duration,
+                  std::vector<std::future_status>{});
+}
+/**
+ * Waits until all futures contain results with a given timeout time and
+ * returns a container of std::future::status
+ */
+template<typename Result, typename Iterator, typename Clock, typename Duration>
+inline
+Result wait_until(
+     Iterator first, Iterator last,
+     const std::chrono::time_point<Clock, Duration>& timeout_time,
+     Result result) {
+  for (; first != last; ++first)
+    result.emplace_back(first->wait_until(timeout_time));
+  return result;
+}
+/**
+ * Waits until all futures contain results with a given timeout time and
+ * returns a vector of std::future::status
+ */
+template<typename Iterator, typename Clock, typename Duration>
+inline
+std::vector<std::future_status> wait_until(
+      Iterator first, Iterator last,
+      const std::chrono::time_point<Clock, Duration>& timeout_time) {
+  return wait_until(first, last, timeout_time,
+                    std::vector<std::future_status>{});
+}
 
 
 namespace detail {
 
 
-template<typename IndexType,
-         IndexType max = std::numeric_limits<IndexType>::max()>
+template<typename Iterator>
+struct future_info {
+  typedef typename std::iterator_traits<Iterator>::value_type future_type;
+  typedef typename std::result_of<
+      decltype(&future_type::get)(future_type)>::type value_type;
+  static constexpr bool is_void = std::is_void<value_type>::value;
+};
+
+
+}  // namespace detail
+
+/**
+ * Calls get() on all futures
+ */
+template<typename Iterator, typename = typename std::enable_if<
+                            detail::future_info<Iterator>::is_void>::type>
+inline
+void get(Iterator first, Iterator last) {
+  for (; first != last; ++first)
+    first->get();
+}
+/**
+ * Calls get() on all futures and stores the results in the returned container
+ */
+template<typename Result, typename Iterator,
+                          typename = typename std::enable_if<
+                          !detail::future_info<Iterator>::is_void>::type>
+inline
+Result get(Iterator first, Iterator last, Result result) {
+  for (; first != last; ++first)
+    result.emplace_back(first->get());
+  return result;
+}
+/**
+ * Calls get() on all futures and stores the results in the returned vector
+ */
+template<typename Iterator,
+         typename = typename std::enable_if<
+         !detail::future_info<Iterator>::is_void>::type>
+inline
+std::vector<typename detail::future_info<Iterator>::value_type>
+get(Iterator first, Iterator last) {
+  return cxxpool::get(first, last,
+         std::vector<typename detail::future_info<Iterator>::value_type>{});
+}
+
+
+namespace detail {
+
+
+template<typename Index, Index max = std::numeric_limits<Index>::max()>
 class infinite_counter {
  public:
   infinite_counter()
@@ -48,13 +160,13 @@ class infinite_counter {
   }
 
  private:
-  std::vector<IndexType> count_;
+  std::vector<Index> count_;
 };
 
 
 class priority_task {
  public:
-  typedef unsigned int counter_elem_t;
+  typedef std::uint64_t counter_elem_t;
 
   priority_task();
 
@@ -137,6 +249,24 @@ class thread_pool {
   template<typename Functor, typename... Args>
   auto push(int priority, Functor&& functor, Args&&... args)
     -> std::future<decltype(functor(args...))>;
+  /**
+   * Waits until all tasks finished
+   */
+  void wait() const;
+  /**
+   * Waits until all tasks finished with a given timeout duration
+   * @param timeout_duration The timeout duration
+   * @return true if all tasks are finished, false otherwise
+   */
+  template<typename Rep, typename Period>
+  bool wait_for(const std::chrono::duration<Rep, Period>& timeout_duration) const;
+  /**
+   * Waits until all tasks finished with a given timeout time
+   * @param timeout_time The timeout time
+   * @return true if all tasks are finished, false otherwise
+   */
+  template<typename Clock, typename Duration>
+  bool wait_until(const std::chrono::time_point<Clock, Duration>& timeout_time) const;
 
  private:
 
@@ -144,15 +274,18 @@ class thread_pool {
 
   int hardware_concurrency() const;
 
-  void run_tasks();
+  void worker();
 
   bool done_;
   std::vector<std::thread> threads_;
   std::priority_queue<detail::priority_task> tasks_;
   detail::infinite_counter<typename detail::priority_task::counter_elem_t>
     task_counter_;
-  std::condition_variable cond_var_;
-  std::mutex mutex_;
+  std::atomic<std::uint64_t> task_balance_;
+  std::condition_variable task_cond_var_;
+  std::mutex task_mutex_;
+  mutable std::condition_variable wait_cond_var_;
+  mutable std::mutex wait_mutex_;
 };
 
 
@@ -166,16 +299,16 @@ class thread_pool_error : public std::runtime_error {
 
 inline
 thread_pool::thread_pool()
-: done_{false}, threads_{}, tasks_{},
-  task_counter_{}, cond_var_{}, mutex_{}
+: done_{false}, threads_{}, tasks_{}, task_counter_{}, task_balance_{},
+  task_cond_var_{}, task_mutex_{}, wait_cond_var_{}, wait_mutex_{}
 {
   init(0);
 }
 
 inline
 thread_pool::thread_pool(int n_threads)
-: done_{false}, threads_{}, tasks_{},
-  task_counter_{}, cond_var_{}, mutex_{}
+: done_{false}, threads_{}, tasks_{}, task_counter_{}, task_balance_{},
+  task_cond_var_{}, task_mutex_{}, wait_cond_var_{}, wait_mutex_{}
 {
   init(n_threads);
 }
@@ -183,10 +316,10 @@ thread_pool::thread_pool(int n_threads)
 inline
 thread_pool::~thread_pool() {
   {
-    std::lock_guard<std::mutex> lock{mutex_};
+    std::lock_guard<std::mutex> lock{task_mutex_};
     done_ = true;
   }
-  cond_var_.notify_all();
+  task_cond_var_.notify_all();
   for (auto& thread : threads_)
     thread.join();
 }
@@ -215,12 +348,38 @@ auto thread_pool::push(int priority, Functor&& functor, Args&&... args)
     std::bind(std::forward<Functor>(functor), std::forward<Args>(args)...));
   auto future = pack_task->get_future();
   {
-      std::lock_guard<std::mutex> lock{mutex_};
-      ++task_counter_;
+      std::lock_guard<std::mutex> lock{task_mutex_};
+      if (done_)
+        throw thread_pool_error{"push called while pool is shutting down"};
+      ++task_counter_; ++task_balance_;
       tasks_.emplace([pack_task]{ (*pack_task)(); }, priority, task_counter_);
   }
-  cond_var_.notify_one();
+  task_cond_var_.notify_one();
   return future;
+}
+
+inline
+void thread_pool::wait() const {
+  std::unique_lock<std::mutex> lock{wait_mutex_};
+  wait_cond_var_.wait(lock, [this]{ return task_balance_ == 0; });
+}
+
+template<typename Rep, typename Period>
+inline
+bool thread_pool::wait_for(
+    const std::chrono::duration<Rep, Period>& timeout_duration) const {
+  std::unique_lock<std::mutex> lock{wait_mutex_};
+  return wait_cond_var_.wait_for(lock, timeout_duration,
+                                 [this]{ return task_balance_ == 0; });
+}
+
+template<typename Clock, typename Duration>
+inline
+bool thread_pool::wait_until(
+    const std::chrono::time_point<Clock, Duration>& timeout_time) const {
+  std::unique_lock<std::mutex> lock{wait_mutex_};
+  return wait_cond_var_.wait_until(lock, timeout_time,
+                                   [this]{ return task_balance_ == 0; });
 }
 
 inline
@@ -229,7 +388,7 @@ void thread_pool::init(int n_threads) {
     n_threads = hardware_concurrency();
   threads_ = std::vector<std::thread>(n_threads);
   for (auto& thread : threads_)
-    thread = std::thread{&thread_pool::run_tasks, this};
+    thread = std::thread{&thread_pool::worker, this};
 }
 
 inline
@@ -242,18 +401,20 @@ int thread_pool::hardware_concurrency() const {
 }
 
 inline
-void thread_pool::run_tasks() {
+void thread_pool::worker() {
   for (;;) {
     detail::priority_task task;
     {
-      std::unique_lock<std::mutex> lock{mutex_};
-      cond_var_.wait(lock, [this]{ return done_ || !tasks_.empty(); });
+      std::unique_lock<std::mutex> lock{task_mutex_};
+      task_cond_var_.wait(lock, [this]{ return done_ || !tasks_.empty(); });
       if (done_ && tasks_.empty())
           break;
       task = tasks_.top();
       tasks_.pop();
     }
     task.callback()();
+    --task_balance_;
+    wait_cond_var_.notify_all();
   }
 }
 

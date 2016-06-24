@@ -62,10 +62,7 @@ std::vector<bool> next_generation(const std::vector<bool>& data,
       }));
     }
   }
-  std::vector<bool> result(data.size());
-  std::transform(futures.begin(), futures.end(), result.begin(),
-                 [](std::future<bool>& f) { return f.get(); });
-  return result;
+  return cxxpool::get(futures.begin(), futures.end());
 }
 
 

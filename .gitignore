@@ -42,3 +42,4 @@ test-driver
 *.tar.gz
 INSTALL
 src/bin/conwaygame
+moc_*

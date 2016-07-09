@@ -1,8 +1,10 @@
-#include <QtCore/QCoreApplication>
+#include <QtWidgets/QApplication>
+#include "conwaygame_gui/game.h"
 
 
 int main(int argc, char **argv) {
-    QCoreApplication a(argc, argv);
-
-    return a.exec();
+  QApplication app(argc, argv);
+  cg_gui::game game;
+  game.show();
+  return app.exec();
 }

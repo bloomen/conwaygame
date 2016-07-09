@@ -66,4 +66,16 @@ std::vector<bool> next_generation(const std::vector<bool>& data,
 }
 
 
+std::vector<bool> random_vector(std::mt19937& gen, std::int64_t n,
+                                float ratio_alive) {
+  EXPECTS(ratio_alive >= 0);
+  EXPECTS(ratio_alive <= 1);
+  std::vector<bool> data(n);
+  std::uniform_real_distribution<float> dist(0, 1);
+  std::generate(data.begin(), data.end(), [&gen, &dist, ratio_alive]{
+    return dist(gen) < ratio_alive;
+  });
+  return data;
+}
+
 }  // namespace cg

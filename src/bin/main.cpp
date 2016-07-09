@@ -1,12 +1,8 @@
-#include <QtGui/QApplication>
-#include <QtGui/QTextEdit>
+#include <QtCore/QCoreApplication>
 
 
-int main(int argv, char **args) {
-  QApplication app(argv, args);
+int main(int argc, char **argv) {
+    QCoreApplication a(argc, argv);
 
-  QTextEdit textEdit;
-  textEdit.show();
-
-  return app.exec();
+    return a.exec();
 }

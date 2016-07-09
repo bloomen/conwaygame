@@ -30,9 +30,9 @@ AC_ARG_ENABLE([debug],
     [debugit=no])
 AC_MSG_RESULT([$debugit])
 if test x"$debugit" = x"yes"; then
-    AM_CXXFLAGS="$AM_CXXFLAGS -g -O0 -Wall -Wextra -Weffc++ -pedantic"
+    AM_CXXFLAGS="$AM_CXXFLAGS -g -O0 -fPIC -Wall -Wextra -Weffc++ -pedantic"
 else
-    AM_CXXFLAGS="$AM_CXXFLAGS -O2"
+    AM_CXXFLAGS="$AM_CXXFLAGS -O2 -fPIC"
 fi
 
 # distribute additional compiler and linker flags among Makefiles

@@ -7,3 +7,8 @@ test
 
 TESTS = \
 test/unittest
+
+EXTRA_DIST = src/bin
+dist-hook:
+	make clean -C src/bin
+	rm -f src/bin/Makefile

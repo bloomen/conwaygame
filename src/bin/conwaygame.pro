@@ -12,3 +12,12 @@ QT += widgets
 HEADERS += conwaygame_gui/game.h
 SOURCES += main.cpp \
            game.cpp
+
+target.path = $$CONWAYGAME_PREFIX
+INSTALLS += target
+
+QMAKE_CLEAN += conwaygame
+
+QMAKE_CXXFLAGS += -std=c++0x
+
+QMAKE_LFLAGS += ../lib/.libs/libconwaygame.a

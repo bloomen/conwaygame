@@ -29,8 +29,10 @@ AC_ARG_ENABLE([debug],
     [debugit="$enableval"],
     [debugit=no])
 AC_MSG_RESULT([$debugit])
+QT_MODE=release
 if test x"$debugit" = x"yes"; then
     AM_CXXFLAGS="$AM_CXXFLAGS -g -O0 -fPIC -Wall -Wextra -Weffc++ -pedantic"
+    QT_MODE=debug
 else
     AM_CXXFLAGS="$AM_CXXFLAGS -O2 -fPIC"
 fi
@@ -43,9 +45,11 @@ AC_SUBST([LIBS])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/lib/Makefile])
-AC_CONFIG_FILES([src/bin/Makefile])
 AC_CONFIG_FILES([test/Makefile])
 
 AC_PROG_INSTALL
 
 AC_OUTPUT
+
+# Generate qt makefile
+cd src/bin && qmake "CONWAYGAME_PREFIX=$prefix/bin" CONFIG+=$QT_MODE

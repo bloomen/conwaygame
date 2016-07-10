@@ -20,4 +20,4 @@ QMAKE_CLEAN += conwaygame
 
 QMAKE_CXXFLAGS += -std=c++0x
 
-QMAKE_LFLAGS += ../lib/.libs/libconwaygame.a
+LIBS += ../lib/.libs/libconwaygame.a

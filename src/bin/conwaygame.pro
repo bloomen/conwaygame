@@ -9,9 +9,11 @@ INCLUDEPATH += . ../lib
 QT += widgets
 
 # Input
-HEADERS += conwaygame_gui/game.h
+HEADERS += conwaygame_gui/game.h \
+           conwaygame_gui/image.h
 SOURCES += main.cpp \
-           game.cpp
+           game.cpp \
+           image.cpp
 
 target.path = $$CONWAYGAME_PREFIX
 INSTALLS += target

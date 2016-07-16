@@ -70,14 +70,16 @@ const int n_threads = 4;
 TEST(test_with_minimal_dead_board) {
   const std::vector<bool> data = {false, false,
                                   false, false};
-  const auto result = cg::next_generation(data, 2, n_threads);
+  auto result = data;
+  cg::next_generation(result, data, 2);
   ASSERT_EQUAL_CONTAINERS(data, result);
 }
 
 TEST(test_with_minimal_alive_board) {
   const std::vector<bool> data = {true, true,
                                   true, true};
-  const auto result = cg::next_generation(data, 2, n_threads);
+  auto result = data;
+  cg::next_generation(result, data, 2);
   const std::vector<bool> expected = {false, false,
                                       false, false};
   ASSERT_EQUAL_CONTAINERS(expected, result);
@@ -89,7 +91,8 @@ TEST(test_with_real_board) {
                                   false, false, false, true, false,
                                   false, true, true, false, false,
                                   false, true, false, true, false};
-  const auto result = cg::next_generation(data, 5, n_threads);
+  auto result = data;
+  cg::next_generation(result, data, 5);
   const std::vector<bool> expected = {true, false, false, true, true,
                                       false, true, false, true, true,
                                       false, true, false, true, false,

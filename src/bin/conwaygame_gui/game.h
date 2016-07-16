@@ -9,6 +9,9 @@
 #include <QtWidgets/QGraphicsPixmapItem>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QDoubleSpinBox>
 #include <conwaygame/memory.h>
 #include <conwaygame/rules.h>
 #include "image.h"
@@ -26,14 +29,20 @@ class game : public QWidget {
  private slots:
   void start();
   void stop();
+  void restart();
   void update_image();
+  void update_speed(int value);
+  void update_size(int value);
+  void update_alive(double value);
 
  private:
   bool running_;
-  std::int64_t n_;
-  float scale_;
-  std::int64_t size_;
+  int image_size_;
+  int n_;
+  double ratio_alive_;
   std::mt19937 gen_;
+  double min_rate_;
+  double current_rate_;
   std::vector<bool> data_;
   std::vector<bool> result_;
   std::unique_ptr<QGraphicsPixmapItem> last_item_;
@@ -42,6 +51,10 @@ class game : public QWidget {
   std::unique_ptr<image> image_;
   std::unique_ptr<QTimer> timer_;
   std::unique_ptr<QPushButton> trigger_button_;
+  std::unique_ptr<QPushButton> restart_button_;
+  std::unique_ptr<QSlider> speed_slider_;
+  std::unique_ptr<QSpinBox> size_spinbox_;
+  std::unique_ptr<QDoubleSpinBox> alive_spinbox_;
 };
 
 

@@ -15,7 +15,7 @@ class image : public QWidget {
 
   void show();
 
-  void update_image(const std::vector<bool>& data, int n, float scale);
+  void update_image(const std::vector<bool>& data, int n, double scale);
 
  private:
   std::unique_ptr<QGraphicsPixmapItem> last_item_;

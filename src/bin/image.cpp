@@ -12,7 +12,7 @@ image::image(QWidget* parent)
 {
 }
 
-void image::update_image(const std::vector<bool>& data, int n, float scale) {
+void image::update_image(const std::vector<bool>& data, int n, double scale) {
   const auto size = n * scale;
   view_->resize(size + 2, size + 2);
 

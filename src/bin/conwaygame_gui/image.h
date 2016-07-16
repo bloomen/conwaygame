@@ -13,8 +13,6 @@ class image : public QWidget {
  public:
   explicit image(QWidget* parent = nullptr);
 
-  void show();
-
   void update_image(const std::vector<bool>& data, int n, double scale);
 
  private:

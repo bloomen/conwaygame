@@ -1,17 +1,12 @@
-#include <QtWidgets/QMainWindow>
-#include <QtGui/QImage>
 #include <QtCore/QTimer>
 #include <QtCore/QTime>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QGraphicsPixmapItem>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QDoubleSpinBox>
+#include <QtWidgets/QLabel>
 #include <conwaygame/memory.h>
 #include <conwaygame/rules.h>
 #include "image.h"
@@ -31,7 +26,8 @@ class game : public QWidget {
   void stop();
   void restart();
   void update_image();
-  void update_speed(int value);
+  void update_speed();
+  void update_rate(int value);
   void update_size(int value);
   void update_alive(double value);
 
@@ -55,6 +51,9 @@ class game : public QWidget {
   std::unique_ptr<QSlider> speed_slider_;
   std::unique_ptr<QSpinBox> size_spinbox_;
   std::unique_ptr<QDoubleSpinBox> alive_spinbox_;
+  std::unique_ptr<QLabel> speed_label_;
+  std::unique_ptr<QLabel> cells_label_;
+  std::unique_ptr<QLabel> alive_label_;
 };
 
 

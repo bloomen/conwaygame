@@ -102,3 +102,39 @@ TEST(test_with_real_board) {
 }
 
 }
+
+COLLECTION(test_random_vector) {
+
+TEST(test_with_alive_zero) {
+  std::mt19937 gen(1);
+  const auto data = cg::random_vector(gen, 10, 0);
+  ASSERT_EQUAL(10u, data.size());
+  for (auto value : data)
+    ASSERT_FALSE(value);
+}
+
+TEST(test_with_alive_one) {
+  std::mt19937 gen(1);
+  const auto data = cg::random_vector(gen, 10, 1);
+  ASSERT_EQUAL(10u, data.size());
+  for (auto value : data)
+    ASSERT_TRUE(value);
+}
+
+TEST(test_with_alive_small) {
+  std::mt19937 gen(1);
+  const auto data = cg::random_vector(gen, 10, 0.1);
+  ASSERT_EQUAL(10u, data.size());
+  const std::vector<bool> exp = {0, 0, 0, 0, 1, 0, 0, 0, 0, 0};
+  ASSERT_EQUAL_CONTAINERS(exp, data);
+}
+
+TEST(test_with_alive_large) {
+  std::mt19937 gen(1);
+  const auto data = cg::random_vector(gen, 10, 0.9);
+  ASSERT_EQUAL(10u, data.size());
+  const std::vector<bool> exp = {1, 0, 1, 0, 1, 1, 1, 0, 1, 1};
+  ASSERT_EQUAL_CONTAINERS(exp, data);
+}
+
+}

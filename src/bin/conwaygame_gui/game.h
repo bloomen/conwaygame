@@ -32,6 +32,7 @@ class game : public QWidget {
   void update_alive(double value);
 
  private:
+  bool app_started_;
   bool running_;
   int image_size_;
   int n_;

@@ -11,10 +11,11 @@ namespace cg_gui {
 
 game::game()
 : QWidget{},
+  app_started_{false},
   running_{false},
   image_size_{650},
-  n_{100},
-  ratio_alive_{0.1},
+  n_{},
+  ratio_alive_{},
   gen_{static_cast<unsigned long>(std::time(0))},
   min_rate_{1000},
   current_rate_{},
@@ -66,12 +67,12 @@ game::game()
   alive_spinbox_->setMaximum(1);
   alive_spinbox_->setDecimals(2);
   alive_spinbox_->setSingleStep(0.01);
-  alive_spinbox_->setValue(ratio_alive_);
+  alive_spinbox_->setValue(0.1);
 
   size_spinbox_->setFont(fixed_font);
   size_spinbox_->setMinimum(10);
   size_spinbox_->setMaximum(1000);
-  size_spinbox_->setValue(n_);
+  size_spinbox_->setValue(100);
 
   timer_->setInterval(current_rate_);
   trigger_button_->setFont(fixed_font);
@@ -86,6 +87,7 @@ game::game()
   alive_label_->setText("Alive");
 
   update_speed();
+  app_started_ = true;
   restart();
 }
 
@@ -107,21 +109,25 @@ void game::stop() {
 }
 
 void game::restart() {
-  std::cout<<__func__<<std::endl;
-  data_ = cg::random_vector(gen_, n_*n_, ratio_alive_);
-  result_ = data_;
-  if (!running_) {
-    update_image();
-    running_ = false;
+  if (app_started_) {
+    std::cout<<__func__<<std::endl;
+    data_ = cg::random_vector(gen_, n_*n_, ratio_alive_);
+    result_ = data_;
+    if (!running_) {
+      update_image();
+      running_ = false;
+    }
   }
 }
 
 void game::update_image() {
   QTime time;
   time.start();
-  cg::next_generation(result_, data_, n_);
-  data_ = result_;
-  image_->update_image(result_, n_, image_size_ / static_cast<double>(n_));
+  if (running_) {
+    cg::next_generation(result_, data_, n_);
+    data_ = result_;
+  }
+  image_->update_image(data_, n_, image_size_ / static_cast<double>(n_));
   const auto current_max_rate = time.elapsed();
   if (current_rate_ < current_max_rate) {
     current_rate_ = current_max_rate;

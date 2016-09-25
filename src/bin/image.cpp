@@ -6,7 +6,7 @@ namespace cg_gui {
 
 
 image::image(QWidget* parent)
-: QWidget{parent}, last_item_{},
+: QGLWidget{parent}, last_item_{},
   scene_{cg::make_unique<QGraphicsScene>(this)},
   view_{cg::make_unique<QGraphicsView>(scene_.get(), this)}
 {

@@ -6,7 +6,7 @@ TEMPLATE = app
 TARGET = conwaygame
 INCLUDEPATH += . ../lib
 
-QT += widgets
+QT += widgets opengl
 
 # Input
 HEADERS += conwaygame_gui/game.h \

@@ -1,13 +1,14 @@
 #include <QtWidgets/QGraphicsPixmapItem>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
+#include <QtOpenGL/QGLWidget>
 #include <conwaygame/memory.h>
 
 
 namespace cg_gui {
 
 
-class image : public QWidget {
+class image : public QGLWidget {
   Q_OBJECT
 
  public:

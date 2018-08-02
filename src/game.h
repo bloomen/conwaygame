@@ -7,8 +7,8 @@
 #include <QtWidgets/QSpinBox>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QLabel>
-#include <conwaygame/memory.h>
-#include <conwaygame/rules.h>
+#include "memory.h"
+#include "rules.h"
 #include "image.h"
 
 

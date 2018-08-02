@@ -2,7 +2,7 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtOpenGL/QGLWidget>
-#include <conwaygame/memory.h>
+#include "memory.h"
 
 
 namespace cg_gui {

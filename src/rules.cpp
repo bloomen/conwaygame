@@ -1,6 +1,5 @@
-#include "conwaygame/rules.h"
-#include "conwaygame/expects.h"
-#include "conwaygame/cxxpool.h"
+#include "rules.h"
+#include "expects.h"
 #include <algorithm>
 
 

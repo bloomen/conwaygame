@@ -45,3 +45,4 @@ src/bin/conwaygame
 moc_*
 confdefs.h
 *.pro.user
+.qmake*

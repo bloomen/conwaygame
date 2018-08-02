@@ -1,5 +1,5 @@
-#include "conwaygame_gui/image.h"
-#include <conwaygame/memory.h>
+#include "image.h"
+#include "memory.h"
 
 
 namespace cg_gui {

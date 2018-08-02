@@ -1,5 +1,5 @@
 #include <QtWidgets/QApplication>
-#include "conwaygame_gui/game.h"
+#include "game.h"
 
 
 int main(int argc, char** argv) {

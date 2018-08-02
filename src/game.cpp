@@ -1,4 +1,4 @@
-#include "conwaygame_gui/game.h"
+#include "game.h"
 #include <QtGui/QFont>
 #include <QtGui/QFontDatabase>
 #include <iostream>
